@@ -1,5 +1,0 @@
-.cache/
-build/
-migrations/*.sql
-.env
-migrations/*.sql
