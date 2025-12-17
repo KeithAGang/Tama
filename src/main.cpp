@@ -30,7 +30,10 @@ int main(int argc, char *argv[]) {
     if (args[0] == "init") {
         if (args.size() < 3) {
             std::println("Error: Missing arguments");
+            return EXIT_FAILURE;
         } else {
+            std::println("Creating sql migration file...");
+
             migration_name = args[2];
 
             auto result = config::load_env(".env");
