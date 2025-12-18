@@ -21,6 +21,15 @@
             "args": ["init"],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "CMake: build"
+        },
+        {
+            "name": "Debug Tama UP errors",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": ["up"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "CMake: build"
         }
     ]
 }

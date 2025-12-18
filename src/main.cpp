@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     const std::map<std::string_view, std::function<void(std::span<std::string_view>)>> dispatch_table {
         { "init", commands::handle_init },
         { "help", commands::handle_help },
-        // { "up",   commands::handle_up }, // TODO Add this later
+        { "up",   commands::handle_up },
     };
 
     // 4. Router Logic

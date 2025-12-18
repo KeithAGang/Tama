@@ -31,6 +31,7 @@ endif()
 add_subdirectory(src/internals/Migrator)
 add_subdirectory(src/internals/Config)
 add_subdirectory(src/internals/Commands)
+add_subdirectory(src/internals/Db)
 
 # --- Main Executable ---
 add_subdirectory(src)

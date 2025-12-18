@@ -36,8 +36,21 @@ namespace commands {
         if (env.contains("TAMA_DB_MIGRATION_DIR") && env.contains("TAMA_DB_ENGINE")) {
             // Construct the Migrator
             // Note: converting string_view to string for the constructor if needed
-            Migrator migrator(env.at("TAMA_DB_MIGRATION_DIR"), env.at("TAMA_DB_ENGINE"), std::string(migration_name));
-            migrator.generate_migration();
+            Migrator migrator(env.at("TAMA_DB_MIGRATION_DIR"), env.at("TAMA_DB_CONNECTION_STRING"), env.at("TAMA_DB_ENGINE"));
+            migrator.generate_migration(migration_name);
+        } else {
+            std::println("Error: .env missing TAMA_DB_MIGRATION_DIR or TAMA_DB_ENGINE");
+        }
+    }
+
+    void handle_up(std::span<std::string_view> args) {
+    // 1. Load Env
+        const auto& env = loadEnvHelper(".env");
+        if (env.contains("TAMA_DB_MIGRATION_DIR") && env.contains("TAMA_DB_ENGINE")) {
+            // Construct the Migrator
+            // Note: converting string_view to string for the constructor if needed
+            Migrator migrator(env.at("TAMA_DB_MIGRATION_DIR"), env.at("TAMA_DB_CONNECTION_STRING"), env.at("TAMA_DB_ENGINE"));
+            migrator.scan_and_print_migrations();
         } else {
             std::println("Error: .env missing TAMA_DB_MIGRATION_DIR or TAMA_DB_ENGINE");
         }

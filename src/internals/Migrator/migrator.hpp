@@ -1,21 +1,35 @@
 #pragma once
 
 #include <string>
+#include "../Db/ledger.hpp"
+
+// Forward declaration (avoids including <sqlite3.h> here)
+struct sqlite3;
 
 class Migrator {
-    public:
-        Migrator(std::string migrationPath, std::string dbEngine, std::string migrationFileName);
-        ~Migrator();
+public:
+    // Constructor now establishes the DB connection
+    Migrator(std::string migrationPath, std::string dbConnStr, std::string dbEngine);
+    
+    // Destructor closes the DB
+    ~Migrator();
 
-        void generate_migration();
+    // 1. Create a new file (init command)
+    void generate_migration(std::string_view name);
 
-    private:
-        std::string migration_path;
-        std::string db_engine;
-        std::string migration_file_name;
+    // 2. Scan and print files (The new requirement)
+    void scan_and_print_migrations();
 
+private:
+    std::string migration_path;
+    std::string db_conn_str;
+    std::string db_engine;
 
-        const std::string migration_file_template = R"(-- +tama up
+    // DB Resources
+    sqlite3* db = nullptr; // Migrator owns this
+    Ledger ledger;         // Migrator owns the instance (which borrows the ptr)
+
+    const std::string migration_file_template = R"(-- +tama up
 SELECT 'up SQL query';
 
 -- +tama down

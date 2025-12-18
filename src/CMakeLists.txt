@@ -1,7 +1,7 @@
-find_package(SQLite3 REQUIRED)
+# find_package(SQLite3 REQUIRED)
 
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE Migrator)
 target_link_libraries(${PROJECT_NAME} PRIVATE Config)
 target_link_libraries(${PROJECT_NAME} PRIVATE Commands)
-target_link_libraries(${PROJECT_NAME} PRIVATE SQLite::SQLite3)
+target_link_libraries(${PROJECT_NAME} PRIVATE Db)
