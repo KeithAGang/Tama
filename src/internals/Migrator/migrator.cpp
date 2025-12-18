@@ -16,8 +16,8 @@ Migrator::Migrator(std::string migrationPath, std::string dbConnStr, std::string
       db_engine(std::move(dbEngine))
 {
     // 1. Open SQLite Database
-    std::println("DEBUG: Attempting to create DB at: [{}]", dbConnStr);
-    std::string db_file = dbConnStr; 
+    std::println("DEBUG: Attempting to create DB at: [{}]", dbConnStr.data());
+    std::string db_file = dbConnStr.data(); 
     
     if (sqlite3_open(db_file.c_str(), &db) != SQLITE_OK) {
         // In C++23, it is safe to throw or handle error gracefully
