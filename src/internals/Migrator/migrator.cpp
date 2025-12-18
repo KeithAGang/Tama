@@ -13,11 +13,10 @@ namespace fs = std::filesystem;
 Migrator::Migrator(std::string migrationPath, std::string dbConnStr, std::string dbEngine)
     : migration_path(std::move(migrationPath)),
       db_conn_str(std::move(dbConnStr)),
-      db_engine(std::move(dbEngine)),
-      // Initialize ledger with nullptr first; we fix it after opening DB
-      ledger(nullptr) 
+      db_engine(std::move(dbEngine))
 {
     // 1. Open SQLite Database
+    std::println("DEBUG: Attempting to create DB at: [{}]", dbConnStr);
     std::string db_file = dbConnStr; 
     
     if (sqlite3_open(db_file.c_str(), &db) != SQLITE_OK) {
@@ -29,7 +28,7 @@ Migrator::Migrator(std::string migrationPath, std::string dbConnStr, std::string
     // 2. Connect the Ledger
     // Now that 'db' is valid, we reconstruct the ledger with it.
     // The Ledger constructor automatically runs "ensure_table_exists()"
-    ledger = Ledger(db);
+    ledger.emplace(db);
 }
 
 Migrator::~Migrator() {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <optional>
 #include "../Db/ledger.hpp"
 
 // Forward declaration (avoids including <sqlite3.h> here)
@@ -27,7 +28,7 @@ private:
 
     // DB Resources
     sqlite3* db = nullptr; // Migrator owns this
-    Ledger ledger;         // Migrator owns the instance (which borrows the ptr)
+    std::optional<Ledger> ledger;         // Migrator owns the instance (which borrows the ptr)
 
     const std::string migration_file_template = R"(-- +tama up
 SELECT 'up SQL query';
