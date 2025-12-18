@@ -5,3 +5,4 @@ migrations/*.sql
 migrations/*.sql
 CLI_DESIGN.md
 CLI_STRUCTURE_AND_PATTERNS.md
+*.db
