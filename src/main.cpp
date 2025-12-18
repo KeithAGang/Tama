@@ -1,10 +1,12 @@
+#include "handlers.hpp"
+#include <map>
+#include <functional>
 #include <print>
 #include <cstdlib>
 #include <span>
 #include <string_view>
 #include <vector>
-#include "internals/Config/config.hpp"
-#include "internals/Migrator/migrator.hpp"
+#include "internals/Commands/handlers.hpp"
 
 int main(int argc, char *argv[]) {
     // 1. Wrap the raw C-array in a std::span
@@ -23,34 +25,34 @@ int main(int argc, char *argv[]) {
     // 3. Simple Router Logic
     if (args.empty()) {
         std::println("Error: No command provided.");
-        std::println("Usage: tama init migration <migration_name>");
+        commands::handle_help({});
         return 1;
     }
-    std::string migration_name = "";
-    if (args[0] == "init") {
-        if (args.size() < 3) {
-            std::println("Error: Missing arguments");
-            return EXIT_FAILURE;
-        } else {
-            std::println("Creating sql migration file...");
 
-            migration_name = args[2];
+    // 3. The Dispatch Table
+    // Maps a string ("init") to a function (commands::handle_init)
+    // using std::string_view as the key is efficient (no copies)
+    const std::map<std::string_view, std::function<void(std::span<std::string_view>)>> dispatch_table {
+        { "init", commands::handle_init },
+        { "help", commands::handle_help },
+        // { "up",   commands::handle_up }, // TODO Add this later
+    };
 
-            auto result = config::load_env(".env");
+    // 4. Router Logic
+    std::string_view command = args[0];
 
-            if (result) {
-                const auto env = *result;
-
-                if (env.contains("TAMA_DB_MIGRATION_DIR") && env.contains("TAMA_DB_ENGINE")) {
-                    Migrator migrator(env.at("TAMA_DB_MIGRATION_DIR"), env.at("TAMA_DB_ENGINE"), migration_name);
-                    migrator.generate_migration();
-                }
-            } else {
-                std::println("Failed to load environment variables");
-            }
-        }
+    if (dispatch_table.contains(command)) {
+        // Pass the *rest* of the args (args[1] onwards) to the handler
+        // we use std::span to create a view of the vector without copying
+        std::span<std::string_view> cmd_args(args.begin() + 1, args.end());
+        
+        // Execute!
+        dispatch_table.at(command)(cmd_args);
+    } else {
+        std::println("Unknown command: '{}'", command);
+        commands::handle_help({});
+        return 1;
     }
 
-    
-    
+    return 0;
 }

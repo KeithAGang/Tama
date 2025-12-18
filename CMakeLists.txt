@@ -30,7 +30,7 @@ endif()
 # --- Sub-projects ---
 add_subdirectory(src/internals/Migrator)
 add_subdirectory(src/internals/Config)
-# add_subdirectory(src/internals/Db)
+add_subdirectory(src/internals/Commands)
 
 # --- Main Executable ---
 add_subdirectory(src)
