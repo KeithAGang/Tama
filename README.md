@@ -8,7 +8,7 @@ Currently, Tama supports the following functionality:
 
 *   **Scaffolding**: Generate timestamped migration SQL files with `up` and `down` annotations.
 *   **Configuration**: Loads database connection settings and preferences from a `.env` file.
-*   **Migration Management**: Apply (`up`) and rollback (`down`) migrations.
+*   **Migration Management**: Apply (`up`), rollback (`down`), and reset (`reset`) migrations.
 *   **SQL Parsing**: Robust SQL parsing for validation and execution.
 *   **Modular Architecture**: Refactored codebase (Migrator, Config, Commands, Db, Parser) for better maintainability.
 *   **Modern C++**: Built using C++23 standards.
