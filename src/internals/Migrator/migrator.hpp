@@ -24,6 +24,12 @@ public:
     // 3. Run UP migrations
     void up();
 
+    // 3. Run Down migrations
+    void down(int steps = 1);
+
+    // 4. Run Drop all migrations
+    void reset() {down(-1); }
+
 private:
     std::string migration_path;
     std::string db_conn_str;

@@ -91,3 +91,33 @@ void Ledger::ensure_ledger_table_exists() {
         sqlite3_free(errMsg); // We must manually free the error message memory
     }
 }
+
+// DELETE: Remove Version
+void Ledger::remove_version(std::string_view version) {
+    // Standard DELETE query using a placeholder (?) for safety
+    const char* sql = "DELETE FROM tama_schema_history WHERE version = ?";
+    sqlite3_stmt* stmt = nullptr;
+
+    // 1. Prepare
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::println(stderr, "Ledger Delete Error: {}", sqlite3_errmsg(db));
+        return;
+    }
+
+    // 2. Bind the version string to the '?'
+    // SQLITE_STATIC means "I promise the string 'version' won't vanish before you run"
+    sqlite3_bind_text(stmt, 1, version.data(), -1, SQLITE_STATIC);
+
+    // 3. Step (Run the Delete)
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+         std::println(stderr, "Failed to remove version {}: {}", version, sqlite3_errmsg(db));
+    } else {
+        // Optional: Check if a row was actually deleted
+        if (sqlite3_changes(db) == 0) {
+            std::println(stderr, "Warning: Version {} was not found in history.", version);
+        }
+    }
+
+    // 4. Finalize
+    sqlite3_finalize(stmt);
+}

@@ -30,6 +30,15 @@
             "args": ["up"],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "CMake: build"
+        },
+        {
+            "name": "Debug Tama DOWN",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": ["down"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "CMake: build"
         }
     ]
 }

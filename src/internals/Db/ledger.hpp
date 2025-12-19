@@ -23,6 +23,9 @@ class Ledger {
         // UPDATE: Inserts a new migration record
         void mark_version_as_applied(std::string_view version);
 
+        // DELETE: Removes a version record (Used during rollback/down)
+        void remove_version(std::string_view version);
+
     private:
         // CREATE: Internal helper to make sure the table exists on startup
         void ensure_ledger_table_exists();

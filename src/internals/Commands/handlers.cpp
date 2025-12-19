@@ -56,9 +56,37 @@ namespace commands {
         }
     }
 
+    void handle_down(std::span<std::string_view> args) {
+    // 1. Load Env
+        const auto& env = loadEnvHelper(".env");
+        if (env.contains("TAMA_DB_MIGRATION_DIR") && env.contains("TAMA_DB_ENGINE")) {
+            // Construct the Migrator
+            // Note: converting string_view to string for the constructor if needed
+            Migrator migrator(env.at("TAMA_DB_MIGRATION_DIR"), env.at("TAMA_DB_CONNECTION_STRING"), env.at("TAMA_DB_ENGINE"));
+            migrator.down();
+        } else {
+            std::println("Error: .env missing TAMA_DB_MIGRATION_DIR or TAMA_DB_ENGINE");
+        }
+    }
+
+    void handle_reset(std::span<std::string_view> args) {
+    // 1. Load Env
+        const auto& env = loadEnvHelper(".env");
+        if (env.contains("TAMA_DB_MIGRATION_DIR") && env.contains("TAMA_DB_ENGINE")) {
+            // Construct the Migrator
+            // Note: converting string_view to string for the constructor if needed
+            Migrator migrator(env.at("TAMA_DB_MIGRATION_DIR"), env.at("TAMA_DB_CONNECTION_STRING"), env.at("TAMA_DB_ENGINE"));
+            migrator.reset();
+        } else {
+            std::println("Error: .env missing TAMA_DB_MIGRATION_DIR or TAMA_DB_ENGINE");
+        }
+    }
+
     void handle_help(std::span<std::string_view> args) {
     std::println("Available commands:");
     std::println("  init <migration_name>   Create a new migration");
     std::println("  up            Run pending migrations");
+    std::println("  down            Drop the last applied migrations");
+    std::println("  reset         Drop all applied migrations");
     }
 }

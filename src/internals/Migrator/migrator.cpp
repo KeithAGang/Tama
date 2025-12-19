@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
+#include <ranges>
 
 namespace fs = std::filesystem;
 
@@ -117,7 +118,7 @@ bool Migrator::execute_sql(std::string_view sql) {
     return true;
 }
 
-// The MAIN LOGIC
+// The UP LOGIC
 void Migrator::up() {
     std::println("Checking for pending migrations...");
 
@@ -190,6 +191,97 @@ void Migrator::up() {
         std::println("Database is up to date.");
     } else {
         std::println("Applied {} migrations.", count);
+    }
+    
+}
+
+// The DROP LOGIC
+void Migrator::down(int steps) {
+
+    if (steps == -1) {
+        std::println("Reverting ALL migrations (Reset)...");
+    } else {
+        std::println("Reverting last {} migration(s)...", steps);
+    }
+
+    // A. Get history from Ledger
+    // Note: ledger is std::optional, so use '->'
+    auto applied_versions = ledger->get_applied_versions();
+
+    // B. Scan files
+    std::vector<std::string> files;
+    for (const auto& entry: fs::directory_iterator(migration_path)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".sql") {
+            files.push_back(entry.path().filename().string());
+        }
+    }
+
+    std::ranges::sort(files); // ensure chronological order
+
+    // C. Iterate and apply
+    int count = 0;
+    for (const auto& filename : files | std::views::reverse) {
+
+        // 1. CHECK LIMIT
+        // If we aren't in "Reset Mode" (-1) and we hit our limit, STOP.
+        if (steps != -1 && count >= steps) {
+            break;
+        }
+        
+        // Extract Version (assumes format: 20251218xxxxx_name.sql)
+        // We take the substring before the first '_'
+        std::string version = filename.substr(0, filename.find('_'));
+
+        // SKIP if not in ledger
+        if (applied_versions.find(version) == applied_versions.end()) {
+            continue;
+        }
+
+        std::println("Dropping: {}", filename);
+
+        // 1. Read & Parse
+        std::string full_path = migration_path + "/" + filename;
+        std::string content = read_file_content(full_path);
+        ParsedMigration parsed = Parser::parse(content);
+
+        if (parsed.down_sql.empty()) {
+            std::println("Warning: No DOWN block found in {}", filename);
+            continue;
+        }
+
+        std::println("Executing DOWN SQL: {}", parsed.down_sql);
+
+        // 2. BEGIN TRANSACTION
+        // This is crucial. If the script fails halfway, we want to undo it.
+        execute_sql("BEGIN TRANSACTION;");
+
+        // 3. Run the user's SQL
+        if (!execute_sql(parsed.down_sql)) {
+            std::println(stderr, "Migration Drop failed! Rolling back...");
+            execute_sql("ROLLBACK;");
+            return; // Stop everything
+        }
+
+        // 4. Update Ledger
+        ledger->remove_version(version);
+
+        // 5. COMMIT
+        // If we got here, both the SQL and the Ledger update are pending.
+        // This saves them both to disk at the exact same time.
+        if (execute_sql("COMMIT;")) {
+            std::println("Success: {}", filename);
+            count++;
+        } else {
+             std::println(stderr, "Commit failed! Rolling back...");
+             execute_sql("ROLLBACK;");
+             return;
+        }
+    }
+
+    if (count == 0) {
+        std::println("Database is up to date.");
+    } else {
+        std::println("Dropped {} migrations.", count);
     }
     
 }

@@ -36,6 +36,8 @@ int main(int argc, char *argv[]) {
         { "init", commands::handle_init },
         { "help", commands::handle_help },
         { "up",   commands::handle_up },
+        { "down", commands::handle_down },
+        { "reset", commands::handle_reset },
     };
 
     // 4. Router Logic
