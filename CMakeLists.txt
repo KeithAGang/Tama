@@ -32,6 +32,7 @@ add_subdirectory(src/internals/Migrator)
 add_subdirectory(src/internals/Config)
 add_subdirectory(src/internals/Commands)
 add_subdirectory(src/internals/Db)
+add_subdirectory(src/internals/Parser)
 
 # --- Main Executable ---
 add_subdirectory(src)

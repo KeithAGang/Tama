@@ -50,7 +50,7 @@ namespace commands {
             // Construct the Migrator
             // Note: converting string_view to string for the constructor if needed
             Migrator migrator(env.at("TAMA_DB_MIGRATION_DIR"), env.at("TAMA_DB_CONNECTION_STRING"), env.at("TAMA_DB_ENGINE"));
-            migrator.scan_and_print_migrations();
+            migrator.up();
         } else {
             std::println("Error: .env missing TAMA_DB_MIGRATION_DIR or TAMA_DB_ENGINE");
         }

@@ -21,6 +21,9 @@ public:
     // 2. Scan and print files (The new requirement)
     void scan_and_print_migrations();
 
+    // 3. Run UP migrations
+    void up();
+
 private:
     std::string migration_path;
     std::string db_conn_str;
@@ -28,11 +31,17 @@ private:
 
     // DB Resources
     sqlite3* db = nullptr; // Migrator owns this
-    std::optional<Ledger> ledger;         // Migrator owns the instance (which borrows the ptr)
+    std::optional<Ledger> ledger;// Migrator owns the instance (which borrows the ptr)
 
     const std::string migration_file_template = R"(-- +tama up
 SELECT 'up SQL query';
 
 -- +tama down
 SELECT 'down SQL query';)";
+
+    // Helper to read a file from disk into a string
+    std::string read_file_content(const std::string& filename);
+    
+    // Helper to run a raw SQL string safely
+    bool execute_sql(std::string_view sql);
 };
