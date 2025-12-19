@@ -8,6 +8,9 @@ Currently, Tama supports the following functionality:
 
 *   **Scaffolding**: Generate timestamped migration SQL files with `up` and `down` annotations.
 *   **Configuration**: Loads database connection settings and preferences from a `.env` file.
+*   **Migration Management**: Apply (`up`) and rollback (`down`) migrations.
+*   **SQL Parsing**: Robust SQL parsing for validation and execution.
+*   **Modular Architecture**: Refactored codebase (Migrator, Config, Commands, Db, Parser) for better maintainability.
 *   **Modern C++**: Built using C++23 standards.
 *   **Build System**: Integrated with CMake.
 *   **Dev Environment**: Ready-to-go VSCode debugging configuration.
@@ -33,10 +36,10 @@ make
 
 #### Initialize a new migration
 
-To create a new migration file in your configured migration directory:
+Create a new migration file in your configured migration directory:
 
 ```bash
-./tama init migration <migration_name>
+./tama init <migration_name>
 ```
 
 ## ⚙️ Configuration
